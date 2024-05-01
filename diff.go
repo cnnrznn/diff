@@ -1,15 +1,11 @@
 package diff
 
-import "fmt"
-
 func Diff(s1, s2 string) Sequence {
 	queue := []*Node{{nil, 0, 0, Equal, ""}}
 
 	for len(queue) > 0 {
 		node := queue[0]
 		queue = queue[1:]
-
-		fmt.Println(node)
 
 		i, j := node.i, node.j
 
@@ -76,7 +72,6 @@ type Sequence struct {
 
 type Step struct {
 	Action Action
-	Index  int
 	Seq    string
 }
 
@@ -95,7 +90,6 @@ func makeSteps(n *Node) []Step {
 	for n != nil {
 		result = append([]Step{{
 			Action: n.action,
-			Index:  0,
 			Seq:    n.seq,
 		}}, result...)
 
@@ -109,5 +103,19 @@ func makeSteps(n *Node) []Step {
 // - Merge adjacent steps with the same action
 // - Remove start step (noop)
 func cleanSteps(steps []Step) []Step {
-	return []Step{}
+	result := []Step{}
+	curr := steps[1]
+
+	for i := 2; i < len(steps); i++ {
+		switch {
+		case steps[i].Action == curr.Action:
+			curr.Seq += steps[i].Seq
+		default:
+			result = append(result, curr)
+			curr = steps[i]
+		}
+	}
+	result = append(result, curr)
+
+	return result
 }
