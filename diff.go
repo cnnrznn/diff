@@ -1,13 +1,21 @@
 package diff
 
+import "fmt"
+
 func Diff(s1, s2 string) Sequence {
 	queue := []*Node{{nil, 0, 0, Equal, ""}}
+	visited := map[string]struct{}{}
 
 	for len(queue) > 0 {
 		node := queue[0]
 		queue = queue[1:]
 
 		i, j := node.i, node.j
+
+		if _, ok := visited[makeKey(i, j)]; ok {
+			continue
+		}
+		visited[makeKey(i, j)] = struct{}{}
 
 		// Break condition; we've found the shortest path to match
 		if i == len(s1) && j == len(s2) {
@@ -118,4 +126,8 @@ func cleanSteps(steps []Step) []Step {
 	result = append(result, curr)
 
 	return result
+}
+
+func makeKey(i, j int) string {
+	return fmt.Sprintf("%d,%d", i, j)
 }
